@@ -4,8 +4,9 @@
 macro_rules! define_skeletons {
     ($func_name:ident) => {
         #[unsafe(no_mangle)]
-        pub unsafe extern "C" fn $func_name() {
+        pub unsafe extern "C" fn $func_name() -> u64 {
             println!("[skeleton]: {}", stringify!($func_name));
+            0
         }
     };
 
@@ -21,6 +22,8 @@ define_skeletons!(
     // SDL_GetKeyboardState
     // SDL_GetWindowSize,
     // SDL_GetWindowSurface,
+    // SDL_UnlockSurface,
+    // SDL_CreateTexture,
     SDL_CreateRenderer,
     SDL_GetNumVideoDisplays,
     SDL_RenderPresent,
@@ -83,7 +86,6 @@ define_skeletons!(
     SDL_JoystickNameForIndex,
     SDL_LockSurface,
     SDL_GetNumRenderDrivers,
-    SDL_UnlockSurface,
     SDL_SetRenderDrawColor,
     SDL_GetRendererInfo,
     SDL_GetWindowPosition,
@@ -103,7 +105,6 @@ define_skeletons!(
     SDL_IsGameController,
     SDL_HasClipboardText,
     SDL_GameControllerGetJoystick,
-    SDL_CreateTexture,
     SDL_GetVideoDriver,
     SDL_RaiseWindow,
     SDL_ShowCursor

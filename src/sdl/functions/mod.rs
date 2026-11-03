@@ -11,8 +11,8 @@ use crate::sdl::types::*;
 
 pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
-pub static mut SURFACE: SDL_Surface =
-    unsafe { std::mem::transmute([0_u8; size_of::<SDL_Surface>()]) };
+pub static mut PIXELS: [u8; 128 * 128 * 4] = [0; _];
+pub static mut SURFACE: SDL_Surface = SDL_Surface::new(&raw mut PIXELS as *mut _ as _);
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
@@ -20,6 +20,16 @@ pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
         *out_len = KEY_MAP.len() as _;
     }
     KEY_MAP.as_ptr()
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_UnlockSurface() {
+    unsafe { println!("{:?}", &PIXELS[..40]) }
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_CreateTexture() -> u64 {
+    0
 }
 
 #[unsafe(no_mangle)]
