@@ -8,6 +8,7 @@ pub use skeletons::*;
 
 use crate::sdl::types::*;
 
+pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
 
 #[unsafe(no_mangle)]
@@ -26,21 +27,18 @@ pub unsafe extern "C" fn SDL_CreateWindow(
     w: u64,
     h: u64,
     flags: u64,
-) -> *mut SDL_Window {
-    let window = Box::into_raw(Box::new(SDL_Window(0)));
+) -> usize {
     unsafe {
         println!(
             "Creating window: {:?} ({w}x{h}) with flags: 0x{flags:x}. Addr: 0x{:x}",
             CStr::from_ptr(title),
-            window as usize
+            WINDOW_HANDLE
         );
     }
-    window
+    WINDOW_HANDLE
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn SDL_DestroyWindow(ptr: *mut SDL_Window) {
-    println!("Destroying window: 0x{:x}", ptr as usize);
-    let b = unsafe { Box::from_raw(ptr) };
-    drop(b);
+pub unsafe extern "C" fn SDL_DestroyWindow(ptr: usize) {
+    println!("Destroying window: 0x{ptr:x}");
 }

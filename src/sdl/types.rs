@@ -28,38 +28,6 @@ pub struct SDL_DisplayMode {
     driverdata: *mut c_void,
 }
 
-/**
- *  The type used to identify a window
- *
- *  * SDL_CreateWindow()
- *  * SDL_CreateWindowFrom()
- *  * SDL_DestroyWindow()
- *  * SDL_GetWindowData()
- *  * SDL_GetWindowFlags()
- *  * SDL_GetWindowGrab()
- *  * SDL_GetWindowPosition()
- *  * SDL_GetWindowSize()
- *  * SDL_GetWindowTitle()
- *  * SDL_HideWindow()
- *  * SDL_MaximizeWindow()
- *  * SDL_MinimizeWindow()
- *  * SDL_RaiseWindow()
- *  * SDL_RestoreWindow()
- *  * SDL_SetWindowData()
- *  * SDL_SetWindowFullscreen()
- *  * SDL_SetWindowGrab()
- *  * SDL_SetWindowIcon()
- *  * SDL_SetWindowPosition()
- *  * SDL_SetWindowSize()
- *  * SDL_SetWindowBordered()
- *  * SDL_SetWindowResizable()
- *  * SDL_SetWindowTitle()
- *  * SDL_ShowWindow()
- */
-pub struct SDL_Window(pub u8);
-// I made it contain a single u8 for the time being so that it is actually allocated.
-// I don't know if it is necessary, will remove later if not
-
 #[derive(Sequence)]
 pub enum SDL_Scancode {
     SDL_SCANCODE_UNKNOWN = 0,
@@ -464,13 +432,13 @@ pub enum SDL_Scancode {
     /* @{ */
 
     /** Usually situated below the display on phones andSDL_SCANCODE_SOFTLEFT = 287,
-                                                                  used as a multi-function feature key for selecting
-                                                                  a software defined function shown on the bottom left
-                                                                  of the display. */
+                                                                      used as a multi-function feature key for selecting
+                                                                      a software defined function shown on the bottom left
+                                                                      of the display. */
     /** Usually situated below the display on phones andSDL_SCANCODE_SOFTRIGHT = 288,
-                                                                   used as a multi-function feature key for selecting
-                                                                   a software defined function shown on the bottom right
-                                                                   of the display. */
+                                                                       used as a multi-function feature key for selecting
+                                                                       a software defined function shown on the bottom right
+                                                                       of the display. */
     /** Used for accepting phone calls. */
     SDL_SCANCODE_CALL = 289,
     /** Used for rejecting phone calls. */
