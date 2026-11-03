@@ -1,36 +1,6 @@
 #![allow(non_camel_case_types)]
 
 use enum_iterator::Sequence;
-use std::ffi::c_void;
-
-/**
- *  The structure that defines a display mode
- *
- *  * SDL_GetNumDisplayModes()
- *  * SDL_GetDisplayMode()
- *  * SDL_GetDesktopDisplayMode()
- *  * SDL_GetCurrentDisplayMode()
- *  * SDL_GetClosestDisplayMode()
- *  * SDL_SetWindowDisplayMode()
- *  * SDL_GetWindowDisplayMode()
- */
-#[repr(C)]
-pub struct SDL_DisplayMode {
-    /** pixel format */
-    format: u32,
-    /** width, in screen coordinates */
-    w: i32,
-    /** height, in screen coordinates */
-    h: i32,
-    /** refresh rate (or zero for unspecified) */
-    refresh_rate: i32,
-    /** driver-specific data, initialize to 0 */
-    driverdata: *mut c_void,
-}
-
-pub type SDL_SurfaceFlags = u32;
-pub type SDL_SurfaceDataFlags = u32;
-pub type SDL_PropertiesID = u32;
 
 #[repr(C)]
 pub struct SDL_Surface {
@@ -469,13 +439,13 @@ pub enum SDL_Scancode {
     /* @{ */
 
     /** Usually situated below the display on phones andSDL_SCANCODE_SOFTLEFT = 287,
-                                                                                                                                                                                                  used as a multi-function feature key for selecting
-                                                                                                                                                                                                  a software defined function shown on the bottom left
-                                                                                                                                                                                                  of the display. */
+                                                                                                                                                                                                              used as a multi-function feature key for selecting
+                                                                                                                                                                                                              a software defined function shown on the bottom left
+                                                                                                                                                                                                              of the display. */
     /** Usually situated below the display on phones andSDL_SCANCODE_SOFTRIGHT = 288,
-                                                                                                                                                                                                   used as a multi-function feature key for selecting
-                                                                                                                                                                                                   a software defined function shown on the bottom right
-                                                                                                                                                                                                   of the display. */
+                                                                                                                                                                                                               used as a multi-function feature key for selecting
+                                                                                                                                                                                                               a software defined function shown on the bottom right
+                                                                                                                                                                                                               of the display. */
     /** Used for accepting phone calls. */
     SDL_SCANCODE_CALL = 289,
     /** Used for rejecting phone calls. */

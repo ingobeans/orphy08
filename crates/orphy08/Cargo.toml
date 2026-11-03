@@ -3,8 +3,12 @@ name = "orphy08"
 version = "0.1.5"
 edition = "2024"
 
+# This is the core orphy08 library. 
+# It does not compile to a sharedlibrary itself, and needs to be used by another crate to do anything.
+# Its main function is to impersonate the SDL2 library, and expose data that can be used by other crates.
+
 [lib]
-crate-type = ["cdylib", "lib"]
+crate-type = ["lib"]
 
 [dependencies]
 enum-iterator = "2.3.0"

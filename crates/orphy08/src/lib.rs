@@ -1,4 +1,6 @@
-mod sdl;
+mod functions;
+mod types;
+
 use std::{sync::Mutex, time::Instant};
 
 pub const SCREEN_DATA_SIZE: usize = 128 * 128 * 4;

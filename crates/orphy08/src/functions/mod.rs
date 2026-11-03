@@ -2,12 +2,11 @@
 #![allow(clippy::missing_safety_doc)]
 
 mod skeletons;
-use std::{ffi::CStr, sync::Mutex, time::Instant};
+use std::{ffi::CStr, time::Instant};
 
 use enum_iterator::cardinality;
-pub use skeletons::*;
 
-use crate::{PIXELS_BUFFER, SCREEN_DATA_SIZE, START_TIME, sdl::types::*};
+use crate::{PIXELS_BUFFER, START_TIME, types::*};
 
 pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
@@ -17,7 +16,7 @@ pub static mut SURFACE: SDL_Surface = SDL_Surface::new(&raw mut PIXELS_BUFFER as
 pub unsafe extern "C" fn SDL_GetTicks() -> u64 {
     let now = Instant::now();
 
-    let start = START_TIME.lock().unwrap().unwrap_or(now.clone());
+    let start = START_TIME.lock().unwrap().unwrap_or(now);
 
     (now - start).as_millis() as _
 }
