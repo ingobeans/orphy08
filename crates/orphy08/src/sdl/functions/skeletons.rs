@@ -5,7 +5,7 @@ macro_rules! define_skeletons {
     ($func_name:ident) => {
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn $func_name() -> u64 {
-            println!("[skeleton]: {}", stringify!($func_name));
+            // println!("[skeleton]: {}", stringify!($func_name));
             0
         }
     };

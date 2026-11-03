@@ -23,11 +23,6 @@ pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn SDL_UnlockSurface() {
-    unsafe { println!("{:?}", &PIXELS[..40]) }
-}
-
-#[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_CreateTexture() -> u64 {
     0
 }

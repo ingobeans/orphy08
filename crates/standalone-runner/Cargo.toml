@@ -1,0 +1,11 @@
+[package]
+name = "orphy08-standalone"
+version = "0.1.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+orphy08 = { path = "../orphy08" }
+macroquad = "0.4.16"
