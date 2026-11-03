@@ -19,6 +19,7 @@ define_skeletons!(
     // SDL_CreateWindow,
     // SDL_DestroyWindow,
     // SDL_GetKeyboardState
+    // SDL_GetWindowSize,
     SDL_CreateRenderer,
     SDL_GetNumVideoDisplays,
     SDL_RenderPresent,
@@ -31,7 +32,6 @@ define_skeletons!(
     SDL_GetDisplayBounds,
     SDL_GL_CreateContext,
     SDL_GetClipboardText,
-    SDL_GetWindowSize,
     SDL_JoystickInstanceID,
     SDL_GetVersion,
     SDL_GameControllerGetAttached,

@@ -20,6 +20,15 @@ pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
 }
 
 #[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_GetWindowSize(handle: usize, w: *mut i32, h: *mut i32) {
+    assert_eq!(handle, WINDOW_HANDLE);
+    unsafe {
+        *w = 128;
+        *h = 128;
+    }
+}
+
+#[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_CreateWindow(
     title: *const i8,
     _x: u64,
@@ -39,6 +48,7 @@ pub unsafe extern "C" fn SDL_CreateWindow(
 }
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn SDL_DestroyWindow(ptr: usize) {
-    println!("Destroying window: 0x{ptr:x}");
+pub unsafe extern "C" fn SDL_DestroyWindow(handle: usize) {
+    assert_eq!(handle, WINDOW_HANDLE);
+    println!("Destroying window: 0x{handle:x}");
 }
