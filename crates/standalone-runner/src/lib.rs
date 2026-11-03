@@ -19,7 +19,7 @@ fn window() -> Conf {
     }
 }
 
-static NEW_FRAME_PIXELS: Mutex<[u8; 128 * 128 * 4]> = Mutex::new([0; _]);
+static NEW_FRAME_PIXELS: Mutex<[u8; SCREEN_DATA_SIZE]> = Mutex::new([0; _]);
 static NEW_FRAME: AtomicBool = AtomicBool::new(false);
 static WINDOW: AtomicBool = AtomicBool::new(false);
 static WINDOW_THREAD: Mutex<Option<JoinHandle<()>>> = Mutex::new(None);
@@ -48,7 +48,7 @@ fn run_window_thread() -> JoinHandle<()> {
     })
 }
 
-fn analyze_screen_data(data: [u8; 128 * 128 * 4]) {
+fn analyze_screen_data(data: [u8; SCREEN_DATA_SIZE]) {
     for (i, p) in data.chunks_exact(4).enumerate() {
         if (p[0] + p[1] + p[2] > 0) || p[3] != 255 {
             println!("B: {p:?} at {i}");
@@ -58,7 +58,7 @@ fn analyze_screen_data(data: [u8; 128 * 128 * 4]) {
 
 #[macroquad::main(window)]
 async fn main() {
-    let texture = Texture2D::from_rgba8(128, 128, &[0; 128 * 128 * 4]);
+    let texture = Texture2D::from_rgba8(128, 128, &[0; SCREEN_DATA_SIZE]);
     texture.set_filter(FilterMode::Nearest);
 
     loop {

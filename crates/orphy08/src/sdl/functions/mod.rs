@@ -7,11 +7,11 @@ use std::ffi::CStr;
 use enum_iterator::cardinality;
 pub use skeletons::*;
 
-use crate::sdl::types::*;
+use crate::{SCREEN_DATA_SIZE, sdl::types::*};
 
 pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
-pub static mut PIXELS: [u8; 128 * 128 * 4] = [0; _];
+pub static mut PIXELS: [u8; SCREEN_DATA_SIZE] = [0; _];
 pub static mut SURFACE: SDL_Surface = SDL_Surface::new(&raw mut PIXELS as *mut _ as _);
 
 #[unsafe(no_mangle)]
