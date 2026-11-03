@@ -54,4 +54,6 @@ pub struct SDL_DisplayMode {
  *  * SDL_SetWindowTitle()
  *  * SDL_ShowWindow()
  */
-pub struct SDL_Window {}
+pub struct SDL_Window(pub u8);
+// I made it contain a single u8 for the time being so that it is actually allocated.
+// I don't know if it is necessary, will remove later if not

@@ -16,9 +16,9 @@ macro_rules! define_skeletons {
 }
 
 define_skeletons!(
-    SDL_DestroyWindow,
+    // SDL_CreateWindow,
+    // SDL_DestroyWindow,
     SDL_CreateRenderer,
-    SDL_CreateWindow,
     SDL_GetNumVideoDisplays,
     SDL_RenderPresent,
     SDL_GL_DeleteContext,
