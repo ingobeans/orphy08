@@ -1,103 +1,110 @@
 //! Contains unimplemented function definitions
 
-/// Defines an exported function that does nothing except log when it has been called
-macro_rules! define_skeleton {
+/// Creates exported functions that does nothing except log when it has been called from a list of names
+macro_rules! define_skeletons {
     ($func_name:ident) => {
         #[unsafe(no_mangle)]
         pub unsafe extern "C" fn $func_name() {
             println!("[skeleton]: {}", stringify!($func_name));
         }
     };
+
+    ($e:ident, $($es:ident),+) => {
+        define_skeletons! { $e }
+        define_skeletons! { $($es),+ }
+    };
 }
 
-define_skeleton!(SDL_DestroyWindow);
-define_skeleton!(SDL_CreateRenderer);
-define_skeleton!(SDL_CreateWindow);
-define_skeleton!(SDL_GetNumVideoDisplays);
-define_skeleton!(SDL_RenderPresent);
-define_skeleton!(SDL_GL_DeleteContext);
-define_skeleton!(SDL_GetCurrentAudioDriver);
-define_skeleton!(SDL_LockAudio);
-define_skeleton!(SDL_GetWindowID);
-define_skeleton!(SDL_GetNumAudioDrivers);
-define_skeleton!(SDL_UnlockAudio);
-define_skeleton!(SDL_GetDisplayBounds);
-define_skeleton!(SDL_GL_CreateContext);
-define_skeleton!(SDL_GetClipboardText);
-define_skeleton!(SDL_GetWindowSize);
-define_skeleton!(SDL_JoystickInstanceID);
-define_skeleton!(SDL_GetVersion);
-define_skeleton!(SDL_GameControllerGetAttached);
-define_skeleton!(SDL_DestroyRenderer);
-define_skeleton!(SDL_JoystickClose);
-define_skeleton!(SDL_JoystickOpen);
-define_skeleton!(SDL_JoystickNumAxes);
-define_skeleton!(SDL_GameControllerGetAxis);
-define_skeleton!(SDL_GetDisplayName);
-define_skeleton!(SDL_GetScancodeName);
-define_skeleton!(SDL_free);
-define_skeleton!(SDL_SetWindowGrab);
-define_skeleton!(SDL_GetCurrentDisplayMode);
-define_skeleton!(SDL_GetCurrentVideoDriver);
-define_skeleton!(SDL_GetNumVideoDrivers);
-define_skeleton!(SDL_PollEvent);
-define_skeleton!(SDL_GetKeyboardFocus);
-define_skeleton!(SDL_NumJoysticks);
-define_skeleton!(SDL_GameControllerAddMapping);
-define_skeleton!(SDL_DestroyTexture);
-define_skeleton!(SDL_Delay);
-define_skeleton!(SDL_GetError);
-define_skeleton!(SDL_UpdateTexture);
-define_skeleton!(SDL_WarpMouseInWindow);
-define_skeleton!(SDL_PauseAudio);
-define_skeleton!(SDL_CreateThread);
-define_skeleton!(SDL_GetModState);
-define_skeleton!(SDL_GetDisplayMode);
-define_skeleton!(SDL_GetRenderDriverInfo);
-define_skeleton!(SDL_Init);
-define_skeleton!(SDL_GameControllerOpen);
-define_skeleton!(SDL_InitSubSystem);
-define_skeleton!(SDL_FreeSurface);
-define_skeleton!(SDL_RenderClear);
-define_skeleton!(SDL_JoystickGetAxis);
-define_skeleton!(SDL_JoystickNumBalls);
-define_skeleton!(SDL_CreateRGBSurfaceFrom);
-define_skeleton!(SDL_GameControllerGetButton);
-define_skeleton!(SDL_GetTicks);
-define_skeleton!(SDL_GameControllerClose);
-define_skeleton!(SDL_JoystickNumButtons);
-define_skeleton!(SDL_RenderCopy);
-define_skeleton!(SDL_UpdateWindowSurface);
-define_skeleton!(SDL_GetKeyFromScancode);
-define_skeleton!(SDL_SetWindowIcon);
-define_skeleton!(SDL_GameControllerNameForIndex);
-define_skeleton!(SDL_GetNumDisplayModes);
-define_skeleton!(SDL_GetWindowSurface);
-define_skeleton!(SDL_JoystickNameForIndex);
-define_skeleton!(SDL_LockSurface);
-define_skeleton!(SDL_GetNumRenderDrivers);
-define_skeleton!(SDL_UnlockSurface);
-define_skeleton!(SDL_SetRenderDrawColor);
-define_skeleton!(SDL_GetRendererInfo);
-define_skeleton!(SDL_GetWindowPosition);
-define_skeleton!(SDL_DetachThread);
-define_skeleton!(SDL_OpenAudio);
-define_skeleton!(SDL_JoystickGetButton);
-define_skeleton!(SDL_GetMouseState);
-define_skeleton!(SDL_GameControllerMapping);
-define_skeleton!(SDL_GetDesktopDisplayMode);
-define_skeleton!(SDL_ClearError);
-define_skeleton!(SDL_GetWindowDisplayIndex);
-define_skeleton!(SDL_GL_SetAttribute);
-define_skeleton!(SDL_SetHint);
-define_skeleton!(SDL_SetWindowTitle);
-define_skeleton!(SDL_GetAudioDriver);
-define_skeleton!(SDL_SetClipboardText);
-define_skeleton!(SDL_IsGameController);
-define_skeleton!(SDL_HasClipboardText);
-define_skeleton!(SDL_GameControllerGetJoystick);
-define_skeleton!(SDL_CreateTexture);
-define_skeleton!(SDL_GetVideoDriver);
-define_skeleton!(SDL_RaiseWindow);
-define_skeleton!(SDL_ShowCursor);
-define_skeleton!(SDL_GetKeyboardState);
+define_skeletons!(
+    SDL_DestroyWindow,
+    SDL_CreateRenderer,
+    SDL_CreateWindow,
+    SDL_GetNumVideoDisplays,
+    SDL_RenderPresent,
+    SDL_GL_DeleteContext,
+    SDL_GetCurrentAudioDriver,
+    SDL_LockAudio,
+    SDL_GetWindowID,
+    SDL_GetNumAudioDrivers,
+    SDL_UnlockAudio,
+    SDL_GetDisplayBounds,
+    SDL_GL_CreateContext,
+    SDL_GetClipboardText,
+    SDL_GetWindowSize,
+    SDL_JoystickInstanceID,
+    SDL_GetVersion,
+    SDL_GameControllerGetAttached,
+    SDL_DestroyRenderer,
+    SDL_JoystickClose,
+    SDL_JoystickOpen,
+    SDL_JoystickNumAxes,
+    SDL_GameControllerGetAxis,
+    SDL_GetDisplayName,
+    SDL_GetScancodeName,
+    SDL_free,
+    SDL_SetWindowGrab,
+    SDL_GetCurrentDisplayMode,
+    SDL_GetCurrentVideoDriver,
+    SDL_GetNumVideoDrivers,
+    SDL_PollEvent,
+    SDL_GetKeyboardFocus,
+    SDL_NumJoysticks,
+    SDL_GameControllerAddMapping,
+    SDL_DestroyTexture,
+    SDL_Delay,
+    SDL_GetError,
+    SDL_UpdateTexture,
+    SDL_WarpMouseInWindow,
+    SDL_PauseAudio,
+    SDL_CreateThread,
+    SDL_GetModState,
+    SDL_GetDisplayMode,
+    SDL_GetRenderDriverInfo,
+    SDL_Init,
+    SDL_GameControllerOpen,
+    SDL_InitSubSystem,
+    SDL_FreeSurface,
+    SDL_RenderClear,
+    SDL_JoystickGetAxis,
+    SDL_JoystickNumBalls,
+    SDL_CreateRGBSurfaceFrom,
+    SDL_GameControllerGetButton,
+    SDL_GetTicks,
+    SDL_GameControllerClose,
+    SDL_JoystickNumButtons,
+    SDL_RenderCopy,
+    SDL_UpdateWindowSurface,
+    SDL_GetKeyFromScancode,
+    SDL_SetWindowIcon,
+    SDL_GameControllerNameForIndex,
+    SDL_GetNumDisplayModes,
+    SDL_GetWindowSurface,
+    SDL_JoystickNameForIndex,
+    SDL_LockSurface,
+    SDL_GetNumRenderDrivers,
+    SDL_UnlockSurface,
+    SDL_SetRenderDrawColor,
+    SDL_GetRendererInfo,
+    SDL_GetWindowPosition,
+    SDL_DetachThread,
+    SDL_OpenAudio,
+    SDL_JoystickGetButton,
+    SDL_GetMouseState,
+    SDL_GameControllerMapping,
+    SDL_GetDesktopDisplayMode,
+    SDL_ClearError,
+    SDL_GetWindowDisplayIndex,
+    SDL_GL_SetAttribute,
+    SDL_SetHint,
+    SDL_SetWindowTitle,
+    SDL_GetAudioDriver,
+    SDL_SetClipboardText,
+    SDL_IsGameController,
+    SDL_HasClipboardText,
+    SDL_GameControllerGetJoystick,
+    SDL_CreateTexture,
+    SDL_GetVideoDriver,
+    SDL_RaiseWindow,
+    SDL_ShowCursor,
+    SDL_GetKeyboardState
+);
