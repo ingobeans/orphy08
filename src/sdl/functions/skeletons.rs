@@ -1,4 +1,4 @@
-//! All the SDL2 functions that will need to be implemented
+//! Contains unimplemented function definitions
 
 /// Defines an exported function that does nothing except log when it has been called
 macro_rules! define_skeleton {
