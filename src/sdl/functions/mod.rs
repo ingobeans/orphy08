@@ -1,4 +1,5 @@
 //! All the SDL2 functions that will need to be implemented
+#![allow(clippy::missing_safety_doc)]
 
 mod skeletons;
 use std::ffi::CStr;
