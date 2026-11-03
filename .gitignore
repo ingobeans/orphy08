@@ -1,3 +1,5 @@
 /target
 pico8*
 *.p8*
+SDL2*
+libSDL2*
