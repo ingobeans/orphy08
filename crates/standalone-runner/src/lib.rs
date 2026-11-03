@@ -8,7 +8,7 @@ use std::{
 };
 
 use macroquad::{miniquad::window::screen_size, prelude::*};
-pub use orphy08::*;
+use orphy08::*;
 
 fn window() -> Conf {
     Conf {
@@ -21,39 +21,40 @@ fn window() -> Conf {
 
 static NEW_FRAME_PIXELS: Mutex<[u8; SCREEN_DATA_SIZE]> = Mutex::new([0; _]);
 static NEW_FRAME: AtomicBool = AtomicBool::new(false);
-static WINDOW: AtomicBool = AtomicBool::new(false);
 static WINDOW_THREAD: Mutex<Option<JoinHandle<()>>> = Mutex::new(None);
 
 #[unsafe(no_mangle)]
-pub unsafe extern "C" fn SDL_UnlockSurface() {
-    if !WINDOW.swap(true, Ordering::Relaxed) {
-        let thread = run_window_thread();
-        let mut lock = WINDOW_THREAD.lock().unwrap();
-        *lock = Some(thread);
-    } else {
-        let mut lock = WINDOW_THREAD.lock().unwrap();
-        let thread = lock.as_mut().unwrap();
-        if thread.is_finished() {
-            let thread = lock.take().unwrap();
-            thread.join().unwrap();
-            exit(0);
-        }
+pub unsafe extern "C" fn SDL_Init() -> i32 {
+    initialize();
+    // println!("LOG: SDL_Init");
+    let mut lock = WINDOW_THREAD.lock().unwrap();
+    if lock.is_some() {
+        return 0;
     }
-    *NEW_FRAME_PIXELS.lock().unwrap() = unsafe { PIXELS };
+    let thread = run_window_thread();
+    *lock = Some(thread);
+    0
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_UnlockSurface() {
+    // println!("LOG: SDL_UnlockSurface");
+    *NEW_FRAME_PIXELS.lock().unwrap() = unsafe { PIXELS_BUFFER };
     NEW_FRAME.store(true, Ordering::Relaxed);
+
+    // check if should close
+    let mut lock = WINDOW_THREAD.lock().unwrap();
+    let thread = lock.as_mut().unwrap();
+    if thread.is_finished() {
+        let thread = lock.take().unwrap();
+        thread.join().unwrap();
+        exit(0);
+    }
 }
 fn run_window_thread() -> JoinHandle<()> {
     std::thread::spawn(|| {
         main();
     })
-}
-
-fn analyze_screen_data(data: [u8; SCREEN_DATA_SIZE]) {
-    for (i, p) in data.chunks_exact(4).enumerate() {
-        if (p[0] + p[1] + p[2] > 0) || p[3] != 255 {
-            println!("B: {p:?} at {i}");
-        }
-    }
 }
 
 #[macroquad::main(window)]
@@ -65,7 +66,7 @@ async fn main() {
         if NEW_FRAME.swap(false, Ordering::Relaxed) {
             let p = NEW_FRAME_PIXELS.lock().unwrap();
             // println!("{:?}", &p[..40]);
-            analyze_screen_data(*p);
+            // analyze_screen_data(*p);
             texture.update_from_bytes(128, 128, &p[..]);
         }
 
