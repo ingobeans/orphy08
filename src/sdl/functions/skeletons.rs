@@ -20,6 +20,7 @@ define_skeletons!(
     // SDL_DestroyWindow,
     // SDL_GetKeyboardState
     // SDL_GetWindowSize,
+    // SDL_GetWindowSurface,
     SDL_CreateRenderer,
     SDL_GetNumVideoDisplays,
     SDL_RenderPresent,
@@ -79,7 +80,6 @@ define_skeletons!(
     SDL_SetWindowIcon,
     SDL_GameControllerNameForIndex,
     SDL_GetNumDisplayModes,
-    SDL_GetWindowSurface,
     SDL_JoystickNameForIndex,
     SDL_LockSurface,
     SDL_GetNumRenderDrivers,

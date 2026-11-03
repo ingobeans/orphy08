@@ -10,6 +10,8 @@ use crate::sdl::types::*;
 
 pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
+pub static mut SURFACE: SDL_Surface =
+    unsafe { std::mem::transmute([0_u8; size_of::<SDL_Surface>()]) };
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
@@ -17,6 +19,12 @@ pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
         *out_len = KEY_MAP.len() as _;
     }
     KEY_MAP.as_ptr()
+}
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_GetWindowSurface(handle: usize) -> *mut SDL_Surface {
+    assert_eq!(handle, WINDOW_HANDLE);
+    &raw mut SURFACE
 }
 
 #[unsafe(no_mangle)]
