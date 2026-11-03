@@ -3,9 +3,20 @@
 mod skeletons;
 use std::ffi::CStr;
 
+use enum_iterator::cardinality;
 pub use skeletons::*;
 
 use crate::sdl::types::*;
+
+pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_GetKeyboardState(out_len: *mut i32) -> *const u8 {
+    unsafe {
+        *out_len = KEY_MAP.len() as _;
+    }
+    KEY_MAP.as_ptr()
+}
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_CreateWindow(

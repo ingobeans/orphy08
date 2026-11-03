@@ -18,6 +18,7 @@ macro_rules! define_skeletons {
 define_skeletons!(
     // SDL_CreateWindow,
     // SDL_DestroyWindow,
+    // SDL_GetKeyboardState
     SDL_CreateRenderer,
     SDL_GetNumVideoDisplays,
     SDL_RenderPresent,
@@ -105,6 +106,5 @@ define_skeletons!(
     SDL_CreateTexture,
     SDL_GetVideoDriver,
     SDL_RaiseWindow,
-    SDL_ShowCursor,
-    SDL_GetKeyboardState
+    SDL_ShowCursor
 );
