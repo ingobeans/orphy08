@@ -53,6 +53,14 @@ pub unsafe extern "C" fn SDL_UnlockSurface() {
         exit(0);
     }
 }
+
+/// Swaps the Red and Blue color channels in a pixel buffer
+fn swap_red_blue(pixels: &mut [u8; SCREEN_DATA_SIZE]) {
+    for chunk in pixels.chunks_exact_mut(4) {
+        chunk.swap(0, 2);
+    }
+}
+
 fn run_window_thread() -> JoinHandle<()> {
     std::thread::spawn(|| {
         main();
@@ -66,10 +74,12 @@ async fn main() {
 
     loop {
         if NEW_FRAME.swap(false, Ordering::Relaxed) {
-            let p = NEW_FRAME_PIXELS.lock().unwrap();
-            // println!("{:?}", &p[..40]);
-            // analyze_screen_data(*p);
-            texture.update_from_bytes(128, 128, &p[..]);
+            let mut pixels = NEW_FRAME_PIXELS.lock().unwrap();
+
+            // Pico-8 uses the BGRA color format, while macroquad requires RGBA
+            swap_red_blue(&mut pixels);
+
+            texture.update_from_bytes(128, 128, &pixels[..]);
         }
 
         let (mut screen_w, mut screen_h) = screen_size();
