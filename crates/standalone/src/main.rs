@@ -29,9 +29,8 @@ async fn main() {
     texture.set_filter(FilterMode::Nearest);
 
     loop {
-        // draw new frame if it is available
+        // Draw new frame if it is available
         if let Ok(OrphyMessage::NewFrame) = rx.try_recv() {
-            // let mut pixels = NEW_FRAME_PIXELS.lock().unwrap();
             let mut pixels = unsafe {
                 let pixels = std::slice::from_raw_parts(addr as *mut u8, VIDEO_DATA_SIZE);
                 pixels.to_vec()
