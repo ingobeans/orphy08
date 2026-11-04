@@ -16,8 +16,8 @@ use std::{
 use enum_iterator::cardinality;
 
 use crate::{
-    OrphyMessage, STDOUT_MESSAGE_HEADER, VIDEO_DATA_SIZE, VIDEO_MEMORY_LABEL, access_shared_memory,
-    types::*,
+    BUFFERED_ENV_KEY, OrphyMessage, STDOUT_MESSAGE_HEADER, VIDEO_DATA_SIZE, VIDEO_MEMORY_LABEL,
+    access_shared_memory, types::*,
 };
 
 static START_TIME: Mutex<Option<Instant>> = Mutex::new(None);
@@ -62,9 +62,7 @@ pub unsafe extern "C" fn SDL_Init() -> i32 {
     *SHARED_VIDEO_MEMORY.lock().unwrap() = SendPointer(addr as _);
 
     // Check if rendering should be buffered
-    let buffered = std::env::args()
-        .find(|a| a.as_str() == "buffered")
-        .is_some();
+    let buffered = std::env::var(BUFFERED_ENV_KEY).is_ok_and(|a| a.as_str() == "true");
     IS_BUFFERED_RENDERING.store(buffered, Ordering::Relaxed);
 
     unsafe {

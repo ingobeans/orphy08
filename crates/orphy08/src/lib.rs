@@ -26,7 +26,7 @@ pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
         .stdout(Stdio::piped());
 
     if buffered {
-        command.arg("buffered");
+        command.env(BUFFERED_ENV_KEY, "true");
     }
 
     let mut child = command.spawn().unwrap();

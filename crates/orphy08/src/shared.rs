@@ -7,6 +7,7 @@ use libc::{
 
 pub const VIDEO_DATA_SIZE: usize = 128 * 128 * 4;
 pub const STDOUT_MESSAGE_HEADER: &[u8] = b"[orphy08]";
+pub const BUFFERED_ENV_KEY: &str = "orphy08-video-buffered";
 
 pub const VIDEO_MEMORY_LABEL: &CStr = c"/orphy08-video-memory";
 
