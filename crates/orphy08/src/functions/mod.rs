@@ -6,7 +6,10 @@ use std::{
     ffi::CStr,
     io::{Write, stdout},
     ptr::null_mut,
-    sync::Mutex,
+    sync::{
+        Mutex,
+        atomic::{AtomicBool, Ordering},
+    },
     time::Instant,
 };
 
@@ -17,26 +20,64 @@ use crate::{
     types::*,
 };
 
-pub static START_TIME: Mutex<Option<Instant>> = Mutex::new(None);
-pub const WINDOW_HANDLE: usize = 1;
-pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
-pub static mut SURFACE: SDL_Surface = SDL_Surface::new(null_mut());
+static START_TIME: Mutex<Option<Instant>> = Mutex::new(None);
+const WINDOW_HANDLE: usize = 1;
+static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
+static SCREEN_BUFFER: Mutex<Option<Vec<u8>>> = Mutex::new(None);
+static SHARED_VIDEO_MEMORY: Mutex<SendPointer<u8>> = Mutex::new(SendPointer(null_mut()));
+static IS_BUFFERED_RENDERING: AtomicBool = AtomicBool::new(false);
+static mut SURFACE: SDL_Surface = SDL_Surface::new(null_mut());
+
+struct SendPointer<T>(*mut T);
+unsafe impl<T> Send for SendPointer<T> {}
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_UpdateWindowSurface() -> i32 {
+    if IS_BUFFERED_RENDERING.load(Ordering::Relaxed) {
+        // If buffered rendering, copy video data to shared video memory
+        unsafe {
+            let lock = SCREEN_BUFFER.lock().unwrap();
+            let screen_buffer = lock.as_ref().unwrap();
+            assert_eq!(screen_buffer.len(), VIDEO_DATA_SIZE);
+
+            std::ptr::copy_nonoverlapping(
+                screen_buffer.as_ptr(),
+                SHARED_VIDEO_MEMORY.lock().unwrap().0,
+                VIDEO_DATA_SIZE,
+            );
+        }
+    }
+
     let mut out = stdout();
     out.write_all(STDOUT_MESSAGE_HEADER).unwrap();
     out.write_all(&[OrphyMessage::NewFrame.to_index()]).unwrap();
     out.write_all(b"\n").unwrap();
+
     0
 }
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_Init() -> i32 {
     let (_fd, addr) = access_shared_memory(VIDEO_MEMORY_LABEL, VIDEO_DATA_SIZE, false);
+    *SHARED_VIDEO_MEMORY.lock().unwrap() = SendPointer(addr as _);
+
+    // Check if rendering should be buffered
+    let buffered = std::env::args()
+        .find(|a| a.as_str() == "buffered")
+        .is_some();
+    IS_BUFFERED_RENDERING.store(buffered, Ordering::Relaxed);
 
     unsafe {
-        SURFACE.pixels = addr as _;
+        if buffered {
+            // If buffered, let Pico-8 write to SCREEN_BUFFER,
+            // and only when SDL_UpdateWindowSurface is the data from there copied to
+            // the shared video memory.
+            let mut screen_buffer = SCREEN_BUFFER.lock().unwrap();
+            *screen_buffer = Some(vec![0; VIDEO_DATA_SIZE]);
+            SURFACE.pixels = screen_buffer.as_ref().unwrap().as_ptr();
+        } else {
+            SURFACE.pixels = addr as _;
+        }
     }
 
     *START_TIME.lock().unwrap() = Some(Instant::now());

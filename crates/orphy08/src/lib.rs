@@ -10,7 +10,7 @@ use std::{
     sync::mpsc::{Receiver, channel},
 };
 
-pub fn launch_orphy08() -> Receiver<OrphyMessage> {
+pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
     let (tx, rx) = channel();
 
     let exe_path = std::env::current_exe()
@@ -19,15 +19,22 @@ pub fn launch_orphy08() -> Receiver<OrphyMessage> {
 
     let pico8_path = "./pico8_dyn";
 
-    let mut child = process::Command::new(pico8_path)
+    let mut command = process::Command::new(pico8_path);
+    command
         .env("LD_LIBRARY_PATH", parent)
-        .stdout(Stdio::piped())
-        .spawn()
-        .unwrap();
+        .stdout(Stdio::piped());
+
+    if buffered {
+        command.arg("buffered");
+    }
+
+    let mut child = command.spawn().unwrap();
+
     let child_stdout = child
         .stdout
         .take()
         .expect("Couldn't pipe output of pico8 executable!");
+
     let mut reader = BufReader::new(child_stdout);
 
     // Create a channel wrapper around child stdout.
