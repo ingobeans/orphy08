@@ -22,10 +22,10 @@ define_skeletons!(
     // SDL_GetKeyboardState
     // SDL_GetWindowSize,
     // SDL_GetWindowSurface,
-    // SDL_UnlockSurface,
     // SDL_CreateTexture,
     // SDL_Init,
     // SDL_GetTicks,
+    SDL_UnlockSurface,
     SDL_CreateRenderer,
     SDL_GetNumVideoDisplays,
     SDL_RenderPresent,

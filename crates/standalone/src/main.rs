@@ -1,7 +1,7 @@
 #![allow(clippy::missing_safety_doc)]
 
 use std::{
-    process::exit,
+    process::{self, Stdio},
     sync::{
         Mutex,
         atomic::{AtomicBool, Ordering},
@@ -21,60 +21,38 @@ fn window() -> Conf {
     }
 }
 
-static NEW_FRAME_PIXELS: Mutex<[u8; SCREEN_DATA_SIZE]> = Mutex::new([0; _]);
+static NEW_FRAME_PIXELS: Mutex<[u8; VIDEO_DATA_SIZE]> = Mutex::new([0; _]);
 static NEW_FRAME: AtomicBool = AtomicBool::new(false);
-static WINDOW_THREAD: Mutex<Option<JoinHandle<()>>> = Mutex::new(None);
 
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn SDL_Init() -> i32 {
-    initialize();
-    // println!("LOG: SDL_Init");
-    let mut lock = WINDOW_THREAD.lock().unwrap();
-    if lock.is_some() {
-        return 0;
-    }
-    let thread = run_window_thread();
-    *lock = Some(thread);
-    0
-}
-
-#[unsafe(no_mangle)]
-pub unsafe extern "C" fn SDL_UnlockSurface() {
-    // println!("LOG: SDL_UnlockSurface");
-    *NEW_FRAME_PIXELS.lock().unwrap() = unsafe { PIXELS_BUFFER };
+fn draw_pixel_buffer() {
+    // *NEW_FRAME_PIXELS.lock().unwrap() = unsafe { PIXELS_BUFFER };
+    *NEW_FRAME_PIXELS.lock().unwrap() = [0; _];
     NEW_FRAME.store(true, Ordering::Relaxed);
-
-    // check if should close
-    let mut lock = WINDOW_THREAD.lock().unwrap();
-    let thread = lock.as_mut().unwrap();
-    if thread.is_finished() {
-        let thread = lock.take().unwrap();
-        thread.join().unwrap();
-        exit(0);
-    }
 }
 
 /// Swaps the Red and Blue color channels in a pixel buffer
-fn swap_red_blue(pixels: &mut [u8; SCREEN_DATA_SIZE]) {
+fn swap_red_blue(pixels: &mut [u8]) {
     for chunk in pixels.chunks_exact_mut(4) {
         chunk.swap(0, 2);
     }
 }
 
-fn run_window_thread() -> JoinHandle<()> {
-    std::thread::spawn(|| {
-        main();
-    })
-}
-
 #[macroquad::main(window)]
 async fn main() {
-    let texture = Texture2D::from_rgba8(128, 128, &[0; SCREEN_DATA_SIZE]);
+    let (_fd, addr) = access_shared_memory(VIDEO_MEMORY_LABEL, VIDEO_DATA_SIZE, true);
+    // let thread = launch_orphy08();
+
+    let texture = Texture2D::from_rgba8(128, 128, &[0; VIDEO_DATA_SIZE]);
     texture.set_filter(FilterMode::Nearest);
 
     loop {
-        if NEW_FRAME.swap(false, Ordering::Relaxed) {
-            let mut pixels = NEW_FRAME_PIXELS.lock().unwrap();
+        // draw new frame if it is available
+        if true || NEW_FRAME.swap(false, Ordering::Relaxed) {
+            // let mut pixels = NEW_FRAME_PIXELS.lock().unwrap();
+            let mut pixels = unsafe {
+                let pixels = std::slice::from_raw_parts(addr as *mut u8, VIDEO_DATA_SIZE);
+                pixels.to_vec()
+            };
 
             // Pico-8 uses the BGRA color format, while macroquad requires RGBA
             swap_red_blue(&mut pixels);

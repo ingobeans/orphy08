@@ -12,7 +12,7 @@ pub struct SDL_Surface {
     /** The distance in bytes between rows of pixels, read-only */
     pitch: i32,
     /** A pointer to the pixels of the surface, the pixels are writeable if non-NULL */
-    pixels: *const u8,
+    pub pixels: *const u8,
     /** Application reference count, used when freeing surface */
     refcount: i32,
     _pad2: [u8; 150 + 96],
@@ -439,13 +439,13 @@ pub enum SDL_Scancode {
     /* @{ */
 
     /** Usually situated below the display on phones andSDL_SCANCODE_SOFTLEFT = 287,
-                                                                                                                                                                                                              used as a multi-function feature key for selecting
-                                                                                                                                                                                                              a software defined function shown on the bottom left
-                                                                                                                                                                                                              of the display. */
+                                                                                                                                                                                                                  used as a multi-function feature key for selecting
+                                                                                                                                                                                                                  a software defined function shown on the bottom left
+                                                                                                                                                                                                                  of the display. */
     /** Usually situated below the display on phones andSDL_SCANCODE_SOFTRIGHT = 288,
-                                                                                                                                                                                                               used as a multi-function feature key for selecting
-                                                                                                                                                                                                               a software defined function shown on the bottom right
-                                                                                                                                                                                                               of the display. */
+                                                                                                                                                                                                                   used as a multi-function feature key for selecting
+                                                                                                                                                                                                                   a software defined function shown on the bottom right
+                                                                                                                                                                                                                   of the display. */
     /** Used for accepting phone calls. */
     SDL_SCANCODE_CALL = 289,
     /** Used for rejecting phone calls. */

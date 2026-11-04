@@ -2,15 +2,28 @@
 #![allow(clippy::missing_safety_doc)]
 
 mod skeletons;
-use std::{ffi::CStr, time::Instant};
+use std::{ffi::CStr, ptr::null_mut, sync::Mutex, time::Instant};
 
 use enum_iterator::cardinality;
 
-use crate::{PIXELS_BUFFER, START_TIME, types::*};
+use crate::{VIDEO_DATA_SIZE, VIDEO_MEMORY_LABEL, access_shared_memory, types::*};
 
+pub static START_TIME: Mutex<Option<Instant>> = Mutex::new(None);
 pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
-pub static mut SURFACE: SDL_Surface = SDL_Surface::new(&raw mut PIXELS_BUFFER as *mut _ as _);
+pub static mut SURFACE: SDL_Surface = SDL_Surface::new(null_mut());
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_Init() -> i32 {
+    let (_fd, addr) = access_shared_memory(VIDEO_MEMORY_LABEL, VIDEO_DATA_SIZE, false);
+
+    unsafe {
+        SURFACE.pixels = addr as _;
+    }
+
+    *START_TIME.lock().unwrap() = Some(Instant::now());
+    0
+}
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_GetTicks() -> u64 {

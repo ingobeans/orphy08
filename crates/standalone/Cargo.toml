@@ -5,9 +5,6 @@ edition = "2024"
 
 # Crate that bundles orphy08 with macroquad to render a native program window
 
-[lib]
-crate-type = ["cdylib"]
-
 [dependencies]
 orphy08 = { path = "../orphy08" }
 macroquad = "0.4.16"

@@ -8,7 +8,8 @@ edition = "2024"
 # Its main function is to impersonate the SDL2 library, and expose data that can be used by other crates.
 
 [lib]
-crate-type = ["lib"]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 enum-iterator = "2.3.0"
+libc = "0.2.191"
