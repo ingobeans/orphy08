@@ -5,7 +5,7 @@ mod types;
 pub use shared::*;
 
 use std::{
-    io::{BufRead, BufReader, Read, Write, stdout},
+    io::{BufRead, BufReader, Write, stdout},
     process::{self, Stdio},
     sync::mpsc::{Receiver, channel},
 };
@@ -47,13 +47,15 @@ pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
                 // get message type
                 let message = OrphyMessage::from_index(buf[STDOUT_MESSAGE_HEADER.len()]);
                 let Ok(_) = tx.send(message) else {
-                    return;
+                    break;
                 };
             } else {
                 stdout().write_all(b"LOG: ").unwrap();
                 stdout().write_all(&buf).unwrap();
             }
         }
+        let _ = child.kill();
+        child.wait().unwrap();
     });
     rx
 }
