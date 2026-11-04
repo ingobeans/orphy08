@@ -5,9 +5,9 @@ mod types;
 pub use shared::*;
 
 use std::{
-    io::Read,
+    io::{BufRead, BufReader, Read, Write, stdout},
     process::{self, Stdio},
-    sync::mpsc::{Receiver, Sender, channel},
+    sync::mpsc::{Receiver, channel},
 };
 
 pub fn launch_orphy08() -> Receiver<OrphyMessage> {
@@ -21,18 +21,30 @@ pub fn launch_orphy08() -> Receiver<OrphyMessage> {
 
     let mut child = process::Command::new(pico8_path)
         .env("LD_LIBRARY_PATH", parent)
-        // .stdout(Stdio::piped())
+        .stdout(Stdio::piped())
         .spawn()
         .unwrap();
-    // let child_stdout = child
-    //     .stdout
-    //     .take()
-    //     .expect("Couldn't pipe output of pico8 executable!");
+    let child_stdout = child
+        .stdout
+        .take()
+        .expect("Couldn't pipe output of pico8 executable!");
+    let mut reader = BufReader::new(child_stdout);
 
     // Create a channel wrapper around child stdout.
     // Regular stdout can only be read blocking.
-    // std::thread::spawn(|| {
-    //     // let mut buf = Vec::with_capacity(SCREEN_DATA_SIZE);
-    // });
+    std::thread::spawn(move || {
+        loop {
+            let mut buf = Vec::with_capacity(128);
+            reader.read_until(b'\n', &mut buf).unwrap();
+            if buf.starts_with(STDOUT_MESSAGE_HEADER) {
+                // get message type
+                let message = OrphyMessage::from_index(buf[STDOUT_MESSAGE_HEADER.len()]);
+                tx.send(message).unwrap();
+            } else {
+                stdout().write_all(b"LOG: ").unwrap();
+                stdout().write_all(&buf).unwrap();
+            }
+        }
+    });
     rx
 }

@@ -2,16 +2,34 @@
 #![allow(clippy::missing_safety_doc)]
 
 mod skeletons;
-use std::{ffi::CStr, ptr::null_mut, sync::Mutex, time::Instant};
+use std::{
+    ffi::CStr,
+    io::{Write, stdout},
+    ptr::null_mut,
+    sync::Mutex,
+    time::Instant,
+};
 
 use enum_iterator::cardinality;
 
-use crate::{VIDEO_DATA_SIZE, VIDEO_MEMORY_LABEL, access_shared_memory, types::*};
+use crate::{
+    OrphyMessage, STDOUT_MESSAGE_HEADER, VIDEO_DATA_SIZE, VIDEO_MEMORY_LABEL, access_shared_memory,
+    types::*,
+};
 
 pub static START_TIME: Mutex<Option<Instant>> = Mutex::new(None);
 pub const WINDOW_HANDLE: usize = 1;
 pub static KEY_MAP: [u8; cardinality::<SDL_Scancode>()] = [0; _];
 pub static mut SURFACE: SDL_Surface = SDL_Surface::new(null_mut());
+
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn SDL_UpdateWindowSurface() -> i32 {
+    let mut out = stdout();
+    out.write_all(STDOUT_MESSAGE_HEADER).unwrap();
+    out.write_all(&[OrphyMessage::NewFrame.to_index()]).unwrap();
+    out.write_all(b"\n").unwrap();
+    0
+}
 
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn SDL_Init() -> i32 {

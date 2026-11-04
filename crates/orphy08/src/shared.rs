@@ -6,16 +6,25 @@ use libc::{
 };
 
 pub const VIDEO_DATA_SIZE: usize = 128 * 128 * 4;
-// pub const STDOUT_MESSAGE_HEADER: &str = "[orphy08]";
+pub const STDOUT_MESSAGE_HEADER: &[u8] = b"[orphy08]";
+
 pub const VIDEO_MEMORY_LABEL: &CStr = c"/orphy08-video-memory";
 
 pub enum OrphyMessage {
     NewFrame,
 }
 impl OrphyMessage {
-    fn into_message(self) {
+    pub fn to_index(self) -> u8 {
         match self {
-            OrphyMessage::NewFrame => {}
+            OrphyMessage::NewFrame => 0,
+        }
+    }
+    pub fn from_index(index: u8) -> Self {
+        match index {
+            0 => OrphyMessage::NewFrame,
+            other => {
+                panic!("ERROR: {other} is not a valid OrphyMessage index!")
+            }
         }
     }
 }
