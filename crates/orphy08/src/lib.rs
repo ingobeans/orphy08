@@ -6,6 +6,7 @@ pub use shared::*;
 
 use std::{
     io::{BufRead, BufReader, Write, stdout},
+    path::{Path, PathBuf},
     process::{self, Stdio},
     sync::mpsc::{Receiver, channel},
 };
@@ -17,7 +18,7 @@ pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
         .expect("ERROR: The path of the orphy08 executable couldn't be found");
     let parent = exe_path.parent().unwrap();
 
-    let pico8_path = "./pico8_dyn";
+    let pico8_path = find_pico8_binary(parent);
 
     let mut command = process::Command::new(pico8_path);
     command
@@ -58,4 +59,21 @@ pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
         child.wait().unwrap();
     });
     rx
+}
+
+fn find_pico8_binary(parent: &Path) -> PathBuf {
+    let mut pico8_path = PathBuf::from("./pico8_dyn");
+    if !pico8_path.exists() {
+        pico8_path = parent.join("pico8_dyn");
+        if !pico8_path.exists() {
+            panic!(
+                "ERROR: Couldn't find 'pico8_dyn'.
+Looked in: 
+    * Directory of current executable ({parent:?})
+    * Current working directory ({:?})\n",
+                std::env::current_dir().unwrap()
+            )
+        }
+    }
+    pico8_path
 }
