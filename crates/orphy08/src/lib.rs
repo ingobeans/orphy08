@@ -39,7 +39,9 @@ pub fn launch_orphy08() -> Receiver<OrphyMessage> {
             if buf.starts_with(STDOUT_MESSAGE_HEADER) {
                 // get message type
                 let message = OrphyMessage::from_index(buf[STDOUT_MESSAGE_HEADER.len()]);
-                tx.send(message).unwrap();
+                let Ok(_) = tx.send(message) else {
+                    return;
+                };
             } else {
                 stdout().write_all(b"LOG: ").unwrap();
                 stdout().write_all(&buf).unwrap();
