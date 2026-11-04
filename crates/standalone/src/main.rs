@@ -21,7 +21,9 @@ fn swap_red_blue(pixels: &mut [u8]) {
 #[macroquad::main(window)]
 async fn main() {
     let (_fd, addr) = access_shared_memory(VIDEO_MEMORY_LABEL, VIDEO_DATA_SIZE, true);
-    let rx = launch_orphy08(true);
+
+    let cart = std::env::args().nth(1).unwrap_or_default();
+    let rx = launch_orphy08(&cart, true);
 
     let texture = Texture2D::from_rgba8(128, 128, &[0; VIDEO_DATA_SIZE]);
     texture.set_filter(FilterMode::Nearest);

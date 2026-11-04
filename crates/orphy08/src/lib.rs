@@ -11,7 +11,7 @@ use std::{
     sync::mpsc::{Receiver, channel},
 };
 
-pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
+pub fn launch_orphy08(cart: &str, buffered: bool) -> Receiver<OrphyMessage> {
     let (tx, rx) = channel();
 
     let exe_path = std::env::current_exe()
@@ -22,8 +22,10 @@ pub fn launch_orphy08(buffered: bool) -> Receiver<OrphyMessage> {
 
     let mut command = process::Command::new(pico8_path);
     command
+        .stdout(Stdio::piped())
         .env("LD_LIBRARY_PATH", parent)
-        .stdout(Stdio::piped());
+        .arg("-run")
+        .arg(cart);
 
     if buffered {
         command.env(BUFFERED_ENV_KEY, "true");

@@ -259,7 +259,7 @@ dependencies = [
 
 [[package]]
 name = "orphy08"
-version = "0.1.11"
+version = "0.1.12"
 dependencies = [
  "enum-iterator",
  "libc",
@@ -267,7 +267,7 @@ dependencies = [
 
 [[package]]
 name = "orphy08-standalone"
-version = "0.1.5"
+version = "0.1.6"
 dependencies = [
  "macroquad",
  "orphy08",
