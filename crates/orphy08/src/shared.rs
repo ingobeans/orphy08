@@ -1,8 +1,8 @@
-use std::{ffi::CStr, os::raw::c_void, ptr::null_mut, sync::Mutex};
+use std::{ffi::CStr, os::raw::c_void, process::exit, ptr::null_mut, sync::Mutex};
 
 use libc::{
     __errno_location, MAP_SHARED, O_CREAT, O_EXCL, O_RDWR, PROT_READ, PROT_WRITE, S_IRUSR, S_IWUSR,
-    atexit, ftruncate, mmap, shm_open, shm_unlink, strerror,
+    SIGINT, SIGSEGV, atexit, ftruncate, mmap, shm_open, shm_unlink, signal, strerror, strsignal,
 };
 
 pub const VIDEO_DATA_SIZE: usize = 128 * 128 * 4;
@@ -42,17 +42,30 @@ fn check_error(res: i32, message: &str) {
 
 static OPENED_MEMORY_REGIONS: Mutex<Vec<&'static CStr>> = Mutex::new(Vec::new());
 
+extern "C" fn clean_up_memory_at_crash(value: i32) {
+    let a = unsafe { CStr::from_ptr(strsignal(value)) };
+    println!("\nProgram quit with signal: {a:?} ({value})");
+    exit(1);
+}
+
 extern "C" fn clean_up_memory_at_exit() {
     let items = OPENED_MEMORY_REGIONS.lock().unwrap();
     for item in items.iter() {
-        println!("closing: {item:?}");
+        println!("Closing shared memory: {item:?}");
         unsafe { shm_unlink(item.as_ptr()) };
+    }
+}
+
+pub fn set_up_memory_cleanup() {
+    unsafe {
+        atexit(clean_up_memory_at_exit);
+        signal(SIGINT, clean_up_memory_at_crash as *const () as usize);
+        signal(SIGSEGV, clean_up_memory_at_crash as *const () as usize);
     }
 }
 
 pub fn access_shared_memory(name: &'static CStr, size: usize, create: bool) -> (i32, *mut c_void) {
     unsafe {
-        atexit(clean_up_memory_at_exit);
         let mut flags = O_RDWR | O_CREAT;
         if create {
             flags |= O_EXCL;
