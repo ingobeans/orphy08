@@ -40,7 +40,7 @@ fn swap_red_blue(pixels: &mut [u8]) {
 #[macroquad::main(window)]
 async fn main() {
     let (_fd, addr) = access_shared_memory(VIDEO_MEMORY_LABEL, VIDEO_DATA_SIZE, true);
-    // let thread = launch_orphy08();
+    let thread = launch_orphy08();
 
     let texture = Texture2D::from_rgba8(128, 128, &[0; VIDEO_DATA_SIZE]);
     texture.set_filter(FilterMode::Nearest);

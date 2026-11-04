@@ -6,7 +6,7 @@ use libc::{
 };
 
 pub const VIDEO_DATA_SIZE: usize = 128 * 128 * 4;
-pub const STDOUT_MESSAGE_HEADER: &str = "[orphy08]";
+// pub const STDOUT_MESSAGE_HEADER: &str = "[orphy08]";
 pub const VIDEO_MEMORY_LABEL: &CStr = c"/orphy08-video-memory";
 
 pub enum OrphyMessage {

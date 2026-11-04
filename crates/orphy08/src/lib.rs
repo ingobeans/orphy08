@@ -21,18 +21,18 @@ pub fn launch_orphy08() -> Receiver<OrphyMessage> {
 
     let mut child = process::Command::new(pico8_path)
         .env("LD_LIBRARY_PATH", parent)
-        .stdout(Stdio::piped())
+        // .stdout(Stdio::piped())
         .spawn()
         .unwrap();
-    let child_stdout = child
-        .stdout
-        .take()
-        .expect("Couldn't pipe output of pico8 executable!");
+    // let child_stdout = child
+    //     .stdout
+    //     .take()
+    //     .expect("Couldn't pipe output of pico8 executable!");
 
     // Create a channel wrapper around child stdout.
     // Regular stdout can only be read blocking.
-    std::thread::spawn(|| {
-        // let mut buf = Vec::with_capacity(SCREEN_DATA_SIZE);
-    });
+    // std::thread::spawn(|| {
+    //     // let mut buf = Vec::with_capacity(SCREEN_DATA_SIZE);
+    // });
     rx
 }

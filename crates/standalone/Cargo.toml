@@ -1,6 +1,6 @@
 [package]
 name = "orphy08-standalone"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 
 # Crate that bundles orphy08 with macroquad to render a native program window
