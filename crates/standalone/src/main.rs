@@ -47,7 +47,7 @@ async fn main() {
                     std::slice::from_raw_parts_mut(addr as _, VIDEO_DATA_SIZE / 4);
                 slice.fill([0, 0, 0, 0]);
                 write_str_to_buffer(
-                    "Hello, World!",
+                    "Hello, World!\nI AM SO HUNGRY\nhiii",
                     slice,
                     128,
                     0,

@@ -3,6 +3,7 @@ const FONT_CHAR_WIDTH: u8 = 5;
 const FONT_CHAR_HEIGHT: u8 = 7;
 const FONT_TOTAL_WIDTH: usize = 495;
 static DOUBLE_WIDTH_CHARS: [u8; 4] = [b'M', b'W', b'm', b'w'];
+static HALF_WIDTH_CHARS: [u8; 2] = [b'i', b'l'];
 
 /// Returns u8::MAX if not found, otherwise the index of the character in the fontsheet.
 /// Multiply by 5 to get the actual X coordinate
@@ -39,9 +40,11 @@ pub fn write_str_to_buffer<T: Copy>(
     on_value: T,
     off_value: Option<T>,
 ) {
+    let start_x = draw_x;
     for char in str.chars() {
         if char == '\n' {
-            draw_y += FONT_CHAR_HEIGHT as usize;
+            draw_y += FONT_CHAR_HEIGHT as usize + 2;
+            draw_x = start_x;
             continue;
         }
         draw_x += write_char_to_buffer(
@@ -69,6 +72,8 @@ pub fn write_char_to_buffer<T: Copy>(
 
     let w = if DOUBLE_WIDTH_CHARS.contains(&char) {
         FONT_CHAR_WIDTH * 2
+    } else if HALF_WIDTH_CHARS.contains(&char) {
+        FONT_CHAR_WIDTH / 2
     } else {
         FONT_CHAR_WIDTH
     };
