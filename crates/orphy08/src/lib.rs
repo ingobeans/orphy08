@@ -93,7 +93,7 @@ fn find_pico8_binary(parent: &Path) -> Result<PathBuf, String> {
         if !pico8_path.exists() {
             return Err(format!(
                 "Couldn't find 'pico8_dyn'.
-Looked in MA: 
+Looked in: 
     * Exe dir:\n{}
 
     * CWD: \n{}",
