@@ -24,7 +24,7 @@ async fn main() {
     set_up_memory_cleanup();
 
     let cart = std::env::args().nth(1).unwrap_or_default();
-    let rx = launch_orphy08(&cart, true);
+    let rx = launch_orphy08(&cart, true, addr as _);
 
     let texture = Texture2D::from_rgba8(128, 128, &[0; VIDEO_DATA_SIZE]);
     texture.set_filter(FilterMode::Nearest);

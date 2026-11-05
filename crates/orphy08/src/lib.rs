@@ -1,3 +1,4 @@
+mod debug;
 mod functions;
 mod shared;
 mod types;
@@ -11,14 +12,32 @@ use std::{
     sync::mpsc::{Receiver, channel},
 };
 
-pub fn launch_orphy08(cart: &str, buffered: bool) -> Receiver<OrphyMessage> {
+use crate::debug::write_error;
+
+/// Launches the orphy08 runtime on another thread.
+///
+/// Video memory pointer is only used if launching fails. Error is shown to the screen.
+pub fn launch_orphy08(cart: &str, buffered: bool, video_memory: *mut u8) -> Receiver<OrphyMessage> {
+    match launch_orphy08_falliable(cart, buffered) {
+        Ok(v) => v,
+        Err(str) => {
+            let (tx, rx) = std::sync::mpsc::channel();
+            tx.send(OrphyMessage::NewFrame).unwrap();
+            eprintln!("ERROR: {str}");
+            write_error(&str, video_memory);
+            rx
+        }
+    }
+}
+
+fn launch_orphy08_falliable(cart: &str, buffered: bool) -> Result<Receiver<OrphyMessage>, String> {
     let (tx, rx) = channel();
 
     let exe_path = std::env::current_exe()
         .expect("ERROR: The path of the orphy08 executable couldn't be found");
     let parent = exe_path.parent().unwrap();
 
-    let pico8_path = find_pico8_binary(parent);
+    let pico8_path = find_pico8_binary(parent)?;
 
     let mut command = process::Command::new(pico8_path);
     command
@@ -31,7 +50,9 @@ pub fn launch_orphy08(cart: &str, buffered: bool) -> Receiver<OrphyMessage> {
         command.env(BUFFERED_ENV_KEY, "true");
     }
 
-    let mut child = command.spawn().unwrap();
+    let mut child = command
+        .spawn()
+        .map_err(|a| format!("Couldn't spawn child: {a}"))?;
 
     let child_stdout = child
         .stdout
@@ -45,37 +66,41 @@ pub fn launch_orphy08(cart: &str, buffered: bool) -> Receiver<OrphyMessage> {
     std::thread::spawn(move || {
         loop {
             let mut buf = Vec::with_capacity(128);
-            reader.read_until(b'\n', &mut buf).unwrap();
+            let len = reader.read_until(b'\n', &mut buf).unwrap();
             if buf.starts_with(STDOUT_MESSAGE_HEADER) {
                 // get message type
                 let message = OrphyMessage::from_index(buf[STDOUT_MESSAGE_HEADER.len()]);
                 let Ok(_) = tx.send(message) else {
                     break;
                 };
-            } else {
+            } else if len > 0 {
                 stdout().write_all(b"LOG: ").unwrap();
                 stdout().write_all(&buf).unwrap();
+            } else {
+                break;
             }
         }
         let _ = child.kill();
         child.wait().unwrap();
     });
-    rx
+    Ok(rx)
 }
 
-fn find_pico8_binary(parent: &Path) -> PathBuf {
+fn find_pico8_binary(parent: &Path) -> Result<PathBuf, String> {
     let mut pico8_path = PathBuf::from("./pico8_dyn");
     if !pico8_path.exists() {
         pico8_path = parent.join("pico8_dyn");
         if !pico8_path.exists() {
-            panic!(
-                "ERROR: Couldn't find 'pico8_dyn'.
+            return Err(format!(
+                "Couldn't find 'pico8_dyn'.
 Looked in: 
-    * Directory of current executable ({parent:?})
-    * Current working directory ({:?})\n",
-                std::env::current_dir().unwrap()
-            )
+    * Exe dir:\n{}
+
+    * CWD: \n{}",
+                parent.to_string_lossy(),
+                std::env::current_dir().unwrap().to_string_lossy()
+            ));
         }
     }
-    pico8_path
+    Ok(pico8_path)
 }
