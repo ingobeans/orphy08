@@ -6,6 +6,7 @@ const FONT_CHAR_HEIGHT: u8 = 7;
 const FONT_TOTAL_WIDTH: usize = 495;
 static DOUBLE_WIDTH_CHARS: [u8; 4] = [b'M', b'W', b'm', b'w'];
 static HALF_WIDTH_CHARS: [u8; 5] = [b'i', b'l', b'\'', b',', b'.'];
+static LOWERED_CHARS: [u8; 3] = [b'g', b'q', b'p'];
 
 /// Returns u8::MAX if not found, otherwise the index of the character in the fontsheet.
 /// Multiply by 5 to get the actual X coordinate
@@ -74,7 +75,7 @@ pub fn write_str_to_buffer<T: Copy>(
         if let Some(c) = chars.peek()
             && draw_x >= 128 - get_width_of(*c as u8) as usize
         {
-            draw_y += FONT_CHAR_HEIGHT as usize + 2;
+            draw_y += FONT_CHAR_HEIGHT as usize + 3;
             draw_x = start_x;
             continue;
         }
@@ -84,7 +85,7 @@ pub fn write_str_to_buffer<T: Copy>(
 #[inline]
 fn get_width_of(char: u8) -> u8 {
     if DOUBLE_WIDTH_CHARS.contains(&char) {
-        FONT_CHAR_WIDTH * 2
+        FONT_CHAR_WIDTH + 2
     } else if HALF_WIDTH_CHARS.contains(&char) {
         FONT_CHAR_WIDTH / 2
     } else {
@@ -97,7 +98,7 @@ pub fn write_char_to_buffer<T: Copy>(
     buf: &mut [T],
     buf_width: usize,
     draw_x: usize,
-    draw_y: usize,
+    mut draw_y: usize,
     on_value: T,
     off_value: Option<T>,
 ) -> u8 {
@@ -109,6 +110,9 @@ pub fn write_char_to_buffer<T: Copy>(
         pos = 127 - 33;
     }
 
+    if LOWERED_CHARS.contains(&char) {
+        draw_y += 3;
+    }
     let w = get_width_of(char);
 
     for x in 0..w {
