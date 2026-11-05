@@ -2,13 +2,21 @@ static FONT_DATA: &[u8] = include_bytes!("../../../font/font.bmp");
 const FONT_CHAR_WIDTH: u8 = 5;
 const FONT_CHAR_HEIGHT: u8 = 7;
 const FONT_TOTAL_WIDTH: usize = 495;
+static DOUBLE_WIDTH_CHARS: [u8; 4] = [b'M', b'W', b'm', b'w'];
 
 /// Returns u8::MAX if not found, otherwise the index of the character in the fontsheet.
 /// Multiply by 5 to get the actual X coordinate
-fn get_pos_of_char(char: u8) -> u8 {
+fn get_pos_of_char(mut char: u8) -> u8 {
     if char < 33 || char > 126 {
         return u8::MAX;
     }
+    let mut add = 0;
+    for c in DOUBLE_WIDTH_CHARS {
+        if char > c {
+            add += 1;
+        }
+    }
+    char += add;
     (char - 33) as _
 }
 
@@ -20,6 +28,26 @@ fn get_font_data_pixel(x: usize, y: usize) -> u8 {
     // y is flipped
     let y = 7 - 1 - y;
     FONT_DATA[HEADER_SIZE + y * stride + x / 8] & (0b10000000 >> (x % 8))
+}
+
+pub fn write_str_to_buffer<T: Copy>(
+    str: &str,
+    buf: &mut [T],
+    buf_width: usize,
+    mut draw_x: usize,
+    mut draw_y: usize,
+    on_value: T,
+    off_value: Option<T>,
+) {
+    for char in str.chars() {
+        if char == '\n' {
+            draw_y += FONT_CHAR_HEIGHT as usize;
+            continue;
+        }
+        draw_x += write_char_to_buffer(
+            char as u8, buf, buf_width, draw_x, draw_y, on_value, off_value,
+        ) as usize;
+    }
 }
 
 pub fn write_char_to_buffer<T: Copy>(
@@ -39,7 +67,13 @@ pub fn write_char_to_buffer<T: Copy>(
         pos = 127 - 33;
     }
 
-    for x in 0..FONT_CHAR_WIDTH {
+    let w = if DOUBLE_WIDTH_CHARS.contains(&char) {
+        FONT_CHAR_WIDTH * 2
+    } else {
+        FONT_CHAR_WIDTH
+    };
+
+    for x in 0..w {
         for y in 0..FONT_CHAR_HEIGHT {
             let pixel = get_font_data_pixel(
                 x as usize + pos as usize * FONT_CHAR_WIDTH as usize,
@@ -58,5 +92,5 @@ pub fn write_char_to_buffer<T: Copy>(
         }
     }
 
-    0
+    w
 }

@@ -1,7 +1,7 @@
 #![allow(clippy::missing_safety_doc)]
 
 use macroquad::{miniquad::window::screen_size, prelude::*};
-use orphy08::{debug::write_char_to_buffer, *};
+use orphy08::{debug::write_str_to_buffer, *};
 
 fn window() -> Conf {
     Conf {
@@ -46,11 +46,11 @@ async fn main() {
                 let slice: &mut [[u8; 4]] =
                     std::slice::from_raw_parts_mut(addr as _, VIDEO_DATA_SIZE / 4);
                 slice.fill([0, 0, 0, 0]);
-                write_char_to_buffer(
-                    'F' as _,
+                write_str_to_buffer(
+                    "Hello, World!",
                     slice,
                     128,
-                    64,
+                    0,
                     64,
                     [255, 255, 255, 255],
                     Some([0, 0, 0, 255]),
