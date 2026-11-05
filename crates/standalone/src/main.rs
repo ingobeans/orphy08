@@ -1,7 +1,7 @@
 #![allow(clippy::missing_safety_doc)]
 
 use macroquad::{miniquad::window::screen_size, prelude::*};
-use orphy08::*;
+use orphy08::{debug::write_char_to_buffer, *};
 
 fn window() -> Conf {
     Conf {
@@ -22,6 +22,8 @@ fn swap_red_blue(pixels: &mut [u8]) {
 async fn main() {
     let (_fd, addr) = access_shared_memory(VIDEO_MEMORY_LABEL, VIDEO_DATA_SIZE, true);
     set_up_memory_cleanup();
+    let mut d = [0_u8; VIDEO_DATA_SIZE];
+    let addr = d.as_mut_ptr();
 
     let cart = std::env::args().nth(1).unwrap_or_default();
     let rx = launch_orphy08(&cart, true);
@@ -39,6 +41,21 @@ async fn main() {
 
             // Pico-8 uses the BGRA color format, while macroquad requires RGBA
             swap_red_blue(&mut pixels);
+
+            unsafe {
+                let slice: &mut [[u8; 4]] =
+                    std::slice::from_raw_parts_mut(addr as _, VIDEO_DATA_SIZE / 4);
+                slice.fill([0, 0, 0, 0]);
+                write_char_to_buffer(
+                    'F' as _,
+                    slice,
+                    128,
+                    64,
+                    64,
+                    [255, 255, 255, 255],
+                    Some([0, 0, 0, 255]),
+                );
+            }
 
             texture.update_from_bytes(128, 128, &pixels[..]);
         }
