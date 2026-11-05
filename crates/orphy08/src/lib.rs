@@ -45,16 +45,18 @@ pub fn launch_orphy08(cart: &str, buffered: bool) -> Receiver<OrphyMessage> {
     std::thread::spawn(move || {
         loop {
             let mut buf = Vec::with_capacity(128);
-            reader.read_until(b'\n', &mut buf).unwrap();
+            let len = reader.read_until(b'\n', &mut buf).unwrap();
             if buf.starts_with(STDOUT_MESSAGE_HEADER) {
                 // get message type
                 let message = OrphyMessage::from_index(buf[STDOUT_MESSAGE_HEADER.len()]);
                 let Ok(_) = tx.send(message) else {
                     break;
                 };
-            } else {
+            } else if len > 0 {
                 stdout().write_all(b"LOG: ").unwrap();
                 stdout().write_all(&buf).unwrap();
+            } else {
+                break;
             }
         }
         let _ = child.kill();
